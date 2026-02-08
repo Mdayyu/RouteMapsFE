@@ -15,9 +15,10 @@ import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 
-import { useState } from "react";
 
 interface SidebarProps {
   open: boolean;
@@ -25,28 +26,28 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-const campuses = [
-  "Universitas Islam Indonesia (UII)",
-  "Universitas Muhammadiyah Yogyakarta (UMY)",
-  "Universitas Ahmad Dahlan (UAD)",
-  "Universitas Sanata Dharma",
-  "Universitas Atma Jaya Yogyakarta",
-  "Universitas Kristen Duta Wacana (UKDW)",
-  "Universitas AMIKOM Yogyakarta",
-  "Universitas Mercu Buana Yogyakarta",
-  "Universitas Widya Mataram",
-  "Universitas Janabadra",
-  "Universitas Cokroaminoto Yogyakarta",
-  "Universitas Sarjanawiyata Tamansiswa",
-  "Universitas Aisyiyah Yogyakarta",
-  "Universitas Alma Ata",
-  "Universitas PGRI Yogyakarta",
-  "Universitas Teknologi Yogyakarta (UTY)",
-  "Universitas Respati Yogyakarta",
-  "Universitas Proklamasi 45",
-  "Universitas Nahdlatul Ulama Yogyakarta",
-  "Universitas Kristen Immanuel",
-];
+// const campuses = [
+//   "Universitas Islam Indonesia (UII)",
+//   "Universitas Muhammadiyah Yogyakarta (UMY)",
+//   "Universitas Ahmad Dahlan (UAD)",
+//   "Universitas Sanata Dharma",
+//   "Universitas Atma Jaya Yogyakarta",
+//   "Universitas Kristen Duta Wacana (UKDW)",
+//   "Universitas AMIKOM Yogyakarta",
+//   "Universitas Mercu Buana Yogyakarta",
+//   "Universitas Widya Mataram",
+//   "Universitas Janabadra",
+//   "Universitas Cokroaminoto Yogyakarta",
+//   "Universitas Sarjanawiyata Tamansiswa",
+//   "Universitas Aisyiyah Yogyakarta",
+//   "Universitas Alma Ata",
+//   "Universitas PGRI Yogyakarta",
+//   "Universitas Teknologi Yogyakarta (UTY)",
+//   "Universitas Respati Yogyakarta",
+//   "Universitas Proklamasi 45",
+//   "Universitas Nahdlatul Ulama Yogyakarta",
+//   "Universitas Kristen Immanuel",
+// ];
 
 
 export function Sidebar({ open }: SidebarProps) {
@@ -54,6 +55,31 @@ export function Sidebar({ open }: SidebarProps) {
   const [openCampus, setOpenCampus] = useState(false);
   const [selectedCampuses, setSelectedCampuses] = useState<string[]>([]);
   const [returnToStart, setReturnToStart] = useState(false);
+  const navigate = useNavigate();
+  const [campuses, setCampuses] = useState<{ key: string; lat: number; lon: number }[]>([]);
+
+  const handleCariRute = () => {
+  if (selectedCampuses.length === 0) {
+    alert("Pilih minimal satu kampus tujuan");
+    return;
+  }
+  navigate("/route", {
+    state: { campuses: selectedCampuses, vehicle, returnToStart },
+  });
+};
+
+
+
+useEffect(() => {
+  fetch("http://127.0.0.1:8000/campuses")
+    .then((res) => res.json())
+    .then((data) => setCampuses(data))
+    .catch((err) => console.error("Failed to fetch campuses", err));
+}, []);
+
+
+
+
 
 
   const toggleCampus = (campus: string) => {
@@ -71,6 +97,14 @@ export function Sidebar({ open }: SidebarProps) {
       selectedCampuses.filter((c) => c !== campus)
     );
   };
+
+  const handleReset = () => {
+  setSelectedCampuses([]);
+  setVehicle("car");
+  setReturnToStart(false);
+  setOpenCampus(false);
+};
+
 
   return (
     <>
@@ -158,31 +192,29 @@ export function Sidebar({ open }: SidebarProps) {
                 },
               }}
             >
-              {campuses.map((k) => (
-                <Stack
-                  key={k}
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  sx={{
-                    px: 1,
-                    py: 0.5,
-                    cursor: "pointer",
-                    borderRadius: 1,
-                    transition: "0.2s",
-                    "&:hover": {
-                      bgcolor: "#f5f5f5",
-                    },
-                  }}
-                  onClick={() => toggleCampus(k)}
-                >
-                  <Checkbox
-                    size="small"
-                    checked={selectedCampuses.includes(k)}
-                  />
-                  <Typography variant="body2">{k}</Typography>
-                </Stack>
-              ))}
+              {campuses.map((campus) => (
+  <Stack
+    key={campus.key}
+    direction="row"
+    alignItems="center"
+    spacing={1}
+    sx={{
+      px: 1,
+      py: 0.5,
+      cursor: "pointer",
+      borderRadius: 1,
+      transition: "0.2s",
+      "&:hover": {
+        bgcolor: "#f5f5f5",
+      },
+    }}
+    onClick={() => toggleCampus(campus.key)}
+  >
+    <Checkbox size="small" checked={selectedCampuses.includes(campus.key)} />
+    <Typography variant="body2">{campus.key}</Typography>
+  </Stack>
+))}
+
             </Box>
           </ClickAwayListener>
         )}
@@ -260,10 +292,15 @@ export function Sidebar({ open }: SidebarProps) {
 
           {/* Action */}
           <Stack direction="row" spacing={1}>
-            <Button fullWidth variant="contained">
+            <Button
+              fullWidth
+              variant="contained"
+               onClick={handleCariRute}
+              disabled={selectedCampuses.length === 0}
+            >
               Cari Rute
             </Button>
-            <Button fullWidth variant="outlined" color="error">
+            <Button fullWidth variant="contained" color="error" onClick={handleReset} disabled={selectedCampuses.length === 0}>
               Reset
             </Button>
           </Stack>
