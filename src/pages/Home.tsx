@@ -11,6 +11,13 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import axios from "axios";
 
+interface Campus {
+  key: string;
+  lat: number;
+  lon: number;
+}
+
+
 // Fix default marker
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -22,9 +29,11 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const apiBaseUrl = 'http://127.0.0.1:8000/';
 
-const Home = () => {
-  const [campuses, setCampuses] = useState([]); // State untuk menyimpan data kampus
+const Home = () => { // State untuk menyimpan data kampus
   const [openSidebar, setOpenSidebar] = useState(false);
+  
+const [campuses, setCampuses] = useState<Campus[]>([]);
+
 
   const position: [number, number] = [-7.7956, 110.3695]; // Koordinat pusat Yogyakarta
 

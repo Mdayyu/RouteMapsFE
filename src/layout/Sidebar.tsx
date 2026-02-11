@@ -17,6 +17,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import LoadingButton from "@mui/lab/LoadingButton";
+
 
 
 
@@ -57,16 +59,26 @@ export function Sidebar({ open }: SidebarProps) {
   const [returnToStart, setReturnToStart] = useState(false);
   const navigate = useNavigate();
   const [campuses, setCampuses] = useState<{ key: string; lat: number; lon: number }[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleCariRute = () => {
+  
+
+ const handleCariRute = async () => {
   if (selectedCampuses.length === 0) {
     alert("Pilih minimal satu kampus tujuan");
     return;
   }
-  navigate("/route", {
-    state: { campuses: selectedCampuses, vehicle, returnToStart },
-  });
+
+  setLoading(true);
+
+  // kasih delay kecil biar efek loading terlihat (opsional)
+  setTimeout(() => {
+    navigate("/route", {
+      state: { campuses: selectedCampuses, vehicle, returnToStart },
+    });
+  }, 800);
 };
+
 
 
 
@@ -99,11 +111,17 @@ useEffect(() => {
   };
 
   const handleReset = () => {
-  setSelectedCampuses([]);
-  setVehicle("car");
-  setReturnToStart(false);
-  setOpenCampus(false);
+  setLoading(true);
+
+  setTimeout(() => {
+    setSelectedCampuses([]);
+    setVehicle("car");
+    setReturnToStart(false);
+    setOpenCampus(false);
+    setLoading(false);
+  }, 800);
 };
+
 
 
   return (
@@ -292,14 +310,15 @@ useEffect(() => {
 
           {/* Action */}
           <Stack direction="row" spacing={1}>
-            <Button
-              fullWidth
-              variant="contained"
-               onClick={handleCariRute}
-              disabled={selectedCampuses.length === 0}
-            >
-              Cari Rute
-            </Button>
+            <LoadingButton
+                fullWidth
+                variant="contained"
+                onClick={handleCariRute}
+                loading={loading}
+                disabled={selectedCampuses.length === 0}
+              >
+                Cari Rute
+              </LoadingButton>
             <Button fullWidth variant="contained" color="error" onClick={handleReset} disabled={selectedCampuses.length === 0}>
               Reset
             </Button>
