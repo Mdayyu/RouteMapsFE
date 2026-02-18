@@ -18,15 +18,20 @@ import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { useTheme, useMediaQuery } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
+
+
 
 
 
 
 interface SidebarProps {
   open: boolean;
-  onOpen: () => void;
   onClose: () => void;
 }
+
 
 // const campuses = [
 //   "Universitas Islam Indonesia (UII)",
@@ -52,7 +57,7 @@ interface SidebarProps {
 // ];
 
 
-export function Sidebar({ open }: SidebarProps) {
+export function Sidebar({ open, onClose }: SidebarProps){
   const [vehicle, setVehicle] = useState<"car" | "motor">("car");
   const [openCampus, setOpenCampus] = useState(false);
   const [selectedCampuses, setSelectedCampuses] = useState<string[]>([]);
@@ -60,6 +65,13 @@ export function Sidebar({ open }: SidebarProps) {
   const navigate = useNavigate();
   const [campuses, setCampuses] = useState<{ key: string; lat: number; lon: number }[]>([]);
   const [loading, setLoading] = useState(false);
+  const theme = useTheme();
+  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery("(max-width:600px)");
+   // HP
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));   // Tablet
+  
+
 
   
 
@@ -126,25 +138,52 @@ useEffect(() => {
 
   return (
     <>
-  <Drawer
-  variant="persistent"
+ <Drawer
+  variant={isTablet ? "temporary" : isMobile ? "temporary": "persistent"}
   anchor="left"
   open={open}
+  onClose={onClose}
+  ModalProps={{
+    keepMounted: true,
+  }}
   PaperProps={{
     sx: {
-      width: 400,
-      height: "100vh",
+      width: isMobile ? "100%" : 400,
+      height: "100%",
       bgcolor: "#cfe8e8",
       overflowY: "auto",
     },
   }}
 >
+
       
 
         {/* LOGO */}
-        <Box display="flex" justifyContent="center" mb={2} mt={2}>
-          <Box component="img" src="/nameWeb.png" alt="Logo" sx={{ height: 60 }} />
-        </Box>
+        <Box
+  display="flex"
+  alignItems="center"
+  justifyContent={isMobile ? "space-between" : "center"}
+  px={2}
+  mb={2}
+  mt={2}
+>
+  {isMobile && (
+    <IconButton onClick={onClose}>
+      <CloseIcon />
+    </IconButton>
+  )}
+
+  <Box
+    component="img"
+    src="/nameWeb.png"
+    alt="Logo"
+    sx={{ height: 60 }}
+  />
+
+  {/* Spacer agar logo tetap tengah saat mobile */}
+  {isMobile && <Box sx={{ width: 40 }} />}
+</Box>
+
 
         <Box sx={{ p: 2 }}>
           {/* Header */}
@@ -176,6 +215,10 @@ useEffect(() => {
             endIcon={openCampus ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             sx={{
               justifyContent: "space-between",
+              outline: "none",
+              "&:focus": {
+                outline: "none",
+              },
             }}
           >
             Pilih Tujuan Kampus
@@ -259,6 +302,12 @@ useEffect(() => {
                 color="error"
                 variant="contained"
                 onClick={() => removeCampus(campus)}
+                sx={{
+                    outline: "none",
+                    "&:focus": {
+                      outline: "none",
+                    },
+                  }}
               >
                 Hapus
               </Button>
@@ -279,6 +328,10 @@ useEffect(() => {
               sx={{
                 bgcolor: vehicle === "car" ? "primary.main" : "white",
                 color: vehicle === "car" ? "white" : "black",
+                 outline: "none",
+                "&:focus": {
+                  outline: "none",
+                },
               }}
             >
               <DirectionsCarIcon />
@@ -289,6 +342,10 @@ useEffect(() => {
               sx={{
                 bgcolor: vehicle === "motor" ? "primary.main" : "white",
                 color: vehicle === "motor" ? "white" : "black",
+                outline: "none",
+                "&:focus": {
+                  outline: "none",
+                },
               }}
             >
               <TwoWheelerIcon />
@@ -316,10 +373,28 @@ useEffect(() => {
                 onClick={handleCariRute}
                 loading={loading}
                 disabled={selectedCampuses.length === 0}
+                sx={{
+                  outline: "none",
+                  "&:focus": {
+                    outline: "none",
+                  },
+                }}
               >
                 Cari Rute
               </LoadingButton>
-            <Button fullWidth variant="contained" color="error" onClick={handleReset} disabled={selectedCampuses.length === 0}>
+            <Button 
+            fullWidth 
+            variant="contained" 
+            color="error" 
+            onClick={handleReset} 
+            disabled={selectedCampuses.length === 0}
+            sx={{
+                outline: "none",
+                "&:focus": {
+                  outline: "none",
+                },
+              }}
+              >
               Reset
             </Button>
           </Stack>

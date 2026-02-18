@@ -1,105 +1,100 @@
 import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Navbar } from "./../layout/Navbar";
-import { Sidebar } from "./../layout/Sidebar";
-
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useState } from "react";
+import { Navbar } from "../layout/Navbar";
+import { Sidebar } from "../layout/Sidebar";
+// import { useTheme, useMediaQuery } from "@mui/material";
+import {
+  MapContainer,
+  TileLayer,
+  LayersControl,
+  ZoomControl,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import axios from "axios";
+const { BaseLayer } = LayersControl;
 
-interface Campus {
-  key: string;
-  lat: number;
-  lon: number;
-}
-
-
-// Fix default marker
-const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-
-const apiBaseUrl = 'http://127.0.0.1:8000/';
-
-const Home = () => { // State untuk menyimpan data kampus
+const Home = () => {
   const [openSidebar, setOpenSidebar] = useState(false);
-  
-const [campuses, setCampuses] = useState<Campus[]>([]);
 
-
-  const position: [number, number] = [-7.7956, 110.3695]; // Koordinat pusat Yogyakarta
-
-  // Mengambil data kampus saat komponen pertama kali dimuat
-  useEffect(() => {
-    const fetchCampuses = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}/campuses`);
-        setCampuses(response.data); // Menyimpan data kampus ke state
-      } catch (error) {
-        console.error('Error fetching campuses:', error);
-      }
-    };
-
-    fetchCampuses();
-  }, []);
+  const position: [number, number] = [-7.7956, 110.3695]; // Yogyakarta
 
   return (
-    <Box sx={{ width: "100vw", height: "100vh" }}>
-
+    <Box
+      sx={{
+        width: "100%",
+        height: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* NAVBAR */}
       <Navbar
         onMenuClick={() => setOpenSidebar(!openSidebar)}
         sidebarOpen={openSidebar}
       />
 
-      <Sidebar
-        open={openSidebar}
-        onClose={() => setOpenSidebar(false)}
-        onOpen={() => {}}
-      />
-
-      {/* MAP */}
+      {/* CONTENT WRAPPER */}
       <Box
         sx={{
-          ml: openSidebar ? "400px" : 0,
-          mt: "64px",
-          width: openSidebar ? "calc(100% - 400px)" : "100%",
-          height: "calc(100vh - 64px)",
-          transition: "all 0.3s ease",
+          display: "flex",
+          flex: 1,
+          overflow: "hidden",
         }}
       >
+        {/* SIDEBAR */}
+        <Sidebar
+          open={openSidebar}
+          onClose={() => setOpenSidebar(false)}
+          
+        />
 
-        <MapContainer
-          center={position}
-          zoom={13}
-          style={{ width: "100%", height: "100%" }}
-        >
-          <TileLayer
-            attribution='&copy; OpenStreetMap contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+        {/* MAP AREA */}
+       <Box
+  sx={{
+    flex: 1,
+    transition: "all 0.3s ease",
+    position: "relative",
+  }}
+>
+<MapContainer
+  center={position}
+  zoom={13}
+  style={{ width: "100%", height: "100%" }}
+  zoomControl={false} // matikan default zoom control
+>
+  {/* Hanya satu zoom control di kanan atas */}
+  <ZoomControl position="topright" />
 
-          {/* Menambahkan marker untuk masing-masing kampus */}
-          {campuses.map((campus) => (
-            <Marker
-              key={campus.key}
-              position={[campus.lat, campus.lon]}
-            >
-              <Popup>
-                {campus.key} <br /> Latitude: {campus.lat} <br /> Longitude: {campus.lon}
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+  <LayersControl position="topright">
+    {/* NORMAL MAP */}
+    <BaseLayer checked name="Peta">
+      <TileLayer
+        attribution="&copy; OpenStreetMap contributors"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+    </BaseLayer>
+
+    {/* SATELLITE */}
+    <BaseLayer name="Satelit">
+      <TileLayer
+        attribution="Tiles © Esri"
+        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      />
+    </BaseLayer>
+
+    {/* HYBRID */}
+    <BaseLayer name="Hybrid">
+      <TileLayer
+        attribution="Tiles © Esri"
+        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      />
+    </BaseLayer>
+  </LayersControl>
+</MapContainer>
+
+        </Box>
       </Box>
-
     </Box>
   );
 };
