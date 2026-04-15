@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 // import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
+// import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
+import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -33,32 +34,11 @@ interface SidebarProps {
 }
 
 
-// const campuses = [
-//   "Universitas Islam Indonesia (UII)",
-//   "Universitas Muhammadiyah Yogyakarta (UMY)",
-//   "Universitas Ahmad Dahlan (UAD)",
-//   "Universitas Sanata Dharma",
-//   "Universitas Atma Jaya Yogyakarta",
-//   "Universitas Kristen Duta Wacana (UKDW)",
-//   "Universitas AMIKOM Yogyakarta",
-//   "Universitas Mercu Buana Yogyakarta",
-//   "Universitas Widya Mataram",
-//   "Universitas Janabadra",
-//   "Universitas Cokroaminoto Yogyakarta",
-//   "Universitas Sarjanawiyata Tamansiswa",
-//   "Universitas Aisyiyah Yogyakarta",
-//   "Universitas Alma Ata",
-//   "Universitas PGRI Yogyakarta",
-//   "Universitas Teknologi Yogyakarta (UTY)",
-//   "Universitas Respati Yogyakarta",
-//   "Universitas Proklamasi 45",
-//   "Universitas Nahdlatul Ulama Yogyakarta",
-//   "Universitas Kristen Immanuel",
-// ];
+
 
 
 export function Sidebar({ open, onClose }: SidebarProps){
-  const [vehicle, setVehicle] = useState<"car" | "motor">("car");
+  const [vehicle, setVehicle] = useState<"mobil" | "sepeda">("mobil");
   const [openCampus, setOpenCampus] = useState(false);
   const [selectedCampuses, setSelectedCampuses] = useState<string[]>([]);
   const [returnToStart, setReturnToStart] = useState(false);
@@ -127,7 +107,7 @@ useEffect(() => {
 
   setTimeout(() => {
     setSelectedCampuses([]);
-    setVehicle("car");
+    setVehicle("mobil");
     setReturnToStart(false);
     setOpenCampus(false);
     setLoading(false);
@@ -324,10 +304,10 @@ useEffect(() => {
 
           <Stack direction="row" spacing={2} mb={2}>
             <IconButton
-              onClick={() => setVehicle("car")}
+              onClick={() => setVehicle("mobil")}
               sx={{
-                bgcolor: vehicle === "car" ? "primary.main" : "white",
-                color: vehicle === "car" ? "white" : "black",
+                bgcolor: vehicle === "mobil" ? "primary.main" : "white",
+                color: vehicle === "mobil" ? "white" : "black",
                  outline: "none",
                 "&:focus": {
                   outline: "none",
@@ -338,21 +318,19 @@ useEffect(() => {
             </IconButton>
 
             <IconButton
-              onClick={() => setVehicle("motor")}
+              onClick={() => setVehicle("sepeda")}
               sx={{
-                bgcolor: vehicle === "motor" ? "primary.main" : "white",
-                color: vehicle === "motor" ? "white" : "black",
+                bgcolor: vehicle === "sepeda" ? "primary.main" : "white",
+                color: vehicle === "sepeda" ? "white" : "black",
                 outline: "none",
-                "&:focus": {
-                  outline: "none",
-                },
+                "&:focus": { outline: "none" },
               }}
             >
-              <TwoWheelerIcon />
+              <DirectionsBikeIcon />
             </IconButton>
           </Stack>
           
-        <Stack direction="row" alignItems="center">
+        <Stack direction="row" alignItems="center" sx={{ mt: 5 }} >
           <Checkbox
             size="small"
             checked={returnToStart}
