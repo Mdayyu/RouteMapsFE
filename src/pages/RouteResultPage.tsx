@@ -1,4 +1,5 @@
-  import {
+
+import {
     Box,
     Card,
     CardContent,
@@ -13,6 +14,16 @@
     TableRow,
     Collapse,
   } from "@mui/material";
+//    declare module "leaflet" {
+//   namespace Control {
+//     class Fullscreen extends Control {
+//       constructor(options?: {
+//         position?: string;
+//         title?: string;
+//       });
+//     }
+//   }
+// }
   // import MapIcon from "@mui/icons-material/Map";
   import { useLocation } from "react-router-dom";
   import "leaflet/dist/leaflet.css";
@@ -29,6 +40,7 @@
  import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
  import "leaflet-fullscreen";
  import { useMediaQuery } from "@mui/material";
+
 
 
 
@@ -67,6 +79,9 @@
     const isTablet = useMediaQuery("(max-width:1024px)");
 
 
+    useEffect(() => {
+  console.log("📦 DATA DITERIMA DI ROUTE PAGE:", routeParams);
+}, [routeParams]);
 
 
     const createNumberedIcon = (number: number) =>
@@ -100,6 +115,7 @@
       const map = useMap();
 
       useEffect(() => {
+      //  const fullscreenControl = new L.Control.Fullscreen();
        const fullscreenControl = new L.Control.Fullscreen();
         map.addControl(fullscreenControl);
 
@@ -121,10 +137,10 @@
     try {
       if (isMounted) setLoading(true);
 
-      const res = await fetch("http://127.0.0.1:8000/route", {
+     const res = await fetch("http://127.0.0.1:8000/route", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(routeParams),
+        body: JSON.stringify(routeParams), 
       });
 
       const data = await res.json();

@@ -9,6 +9,12 @@ import {
   Checkbox,
   TextField,
 } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 // import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 // import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
@@ -21,9 +27,10 @@ import { useState, useEffect } from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useTheme, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
-
-
+import SettingsIcon from '@mui/icons-material/Settings';
+import Tooltip from '@mui/material/Tooltip';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 
 
@@ -38,6 +45,14 @@ interface SidebarProps {
 
 
 export function Sidebar({ open, onClose }: SidebarProps){
+  const [parameters, setParameters] = useState({
+  ALPHA: 4,
+  BETA: 1,
+  EVAPORATION: 1,
+  QA: 100,
+  NUM_ANTS: 10,
+  NUM_ITERATIONS: 10,
+});
   const [vehicle, setVehicle] = useState<"mobil" | "sepeda">("mobil");
   const [openCampus, setOpenCampus] = useState(false);
   const [selectedCampuses, setSelectedCampuses] = useState<string[]>([]);
@@ -48,14 +63,22 @@ export function Sidebar({ open, onClose }: SidebarProps){
   const theme = useTheme();
   // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMobile = useMediaQuery("(max-width:600px)");
-   // HP
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));   // Tablet
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));  
+  const [openParameterDialog, setOpenParameterDialog] = useState(false);
+  const [tempParams, setTempParams] = useState(parameters);
   
 
+useEffect(() => {
+  fetch("http://127.0.0.1:8000/campuses")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Data Kampus:", data); 
+      setCampuses(data); // Set data kampus ke state
+    })
+    .catch((err) => console.error("Failed to fetch campuses", err));
+}, []);
 
-  
-
- const handleCariRute = async () => {
+const handleCariRute = async () => {
   if (selectedCampuses.length === 0) {
     alert("Pilih minimal satu kampus tujuan");
     return;
@@ -63,28 +86,32 @@ export function Sidebar({ open, onClose }: SidebarProps){
 
   setLoading(true);
 
-  // kasih delay kecil biar efek loading terlihat (opsional)
   setTimeout(() => {
+    const payload = {
+      campuses: selectedCampuses,
+      vehicle,
+      returnToStart,
+      ...parameters, //  parameter terbaru
+    };
+
+    console.log("🚀 DATA DIKIRIM:", payload); // DEBUG
+
     navigate("/route", {
-      state: { campuses: selectedCampuses, vehicle, returnToStart },
+      state: payload,
     });
-  }, 800);
+
+    setLoading(false);
+  }, 500);
 };
 
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+  });
 
-
-
-useEffect(() => {
-  fetch("http://127.0.0.1:8000/campuses")
-    .then((res) => res.json())
-    .then((data) => setCampuses(data))
-    .catch((err) => console.error("Failed to fetch campuses", err));
-}, []);
-
-
-
-
-
+  const showSnackbar = (message: string) => {
+    setSnackbar({ open: true, message });
+  };
 
   const toggleCampus = (campus: string) => {
     if (selectedCampuses.includes(campus)) {
@@ -96,13 +123,18 @@ useEffect(() => {
     }
   };
 
-  const removeCampus = (campus: string) => {
-    setSelectedCampuses(
-      selectedCampuses.filter((c) => c !== campus)
-    );
-  };
+  const isChanged =
+  JSON.stringify(tempParams) !== JSON.stringify(parameters);
 
-  const handleReset = () => {
+  const removeCampus = (campus: string) => {
+  setSelectedCampuses(
+    selectedCampuses.filter((c) => c !== campus)
+  );
+
+  showSnackbar(`${campus} berhasil dihapus`);
+};
+
+ const handleReset = () => {
   setLoading(true);
 
   setTimeout(() => {
@@ -111,6 +143,8 @@ useEffect(() => {
     setReturnToStart(false);
     setOpenCampus(false);
     setLoading(false);
+
+    showSnackbar("Data berhasil direset");
   }, 800);
 };
 
@@ -118,65 +152,94 @@ useEffect(() => {
 
   return (
     <>
- <Drawer
-  variant={isTablet ? "temporary" : isMobile ? "temporary": "persistent"}
-  anchor="left"
-  open={open}
-  onClose={onClose}
-  ModalProps={{
-    keepMounted: true,
-  }}
-  PaperProps={{
-    sx: {
-      width: isMobile ? "100%" : 400,
-      height: "100%",
-      bgcolor: "#cfe8e8",
-      overflowY: "auto",
-    },
-  }}
->
+
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={3000}
+      onClose={() => setSnackbar({ ...snackbar, open: false })}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert severity="success" variant="filled">
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
+        <Drawer
+          variant={isTablet ? "temporary" : isMobile ? "temporary": "persistent"}
+          anchor="left"
+          open={open}
+          onClose={onClose}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          PaperProps={{
+            sx: {
+              width: isMobile ? "100%" : 400,
+              height: "100%",
+              bgcolor: "#cfe8e8",
+              overflowY: "auto",
+            },
+          }}
+        >
 
       
 
         {/* LOGO */}
         <Box
-  display="flex"
-  alignItems="center"
-  justifyContent={isMobile ? "space-between" : "center"}
-  px={2}
-  mb={2}
-  mt={2}
->
-  {isMobile && (
-    <IconButton onClick={onClose}>
-      <CloseIcon />
-    </IconButton>
-  )}
+          display="flex"
+          alignItems="center"
+          justifyContent={isMobile ? "space-between" : "center"}
+          px={2}
+          mb={2}
+          mt={2}
+        >
+          {isMobile && (
+            <IconButton onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          )}
 
-  <Box
-    component="img"
-    src="/nameWeb.png"
-    alt="Logo"
-    sx={{ height: 60 }}
-  />
+          <Box
+            component="img"
+            src="/nameWeb.png"
+            alt="Logo"
+            sx={{ height: 60 }}
+          />
 
-  {/* Spacer agar logo tetap tengah saat mobile */}
-  {isMobile && <Box sx={{ width: 40 }} />}
-</Box>
+          {/* Spacer agar logo tetap tengah saat mobile */}
+          {isMobile && <Box sx={{ width: 40 }} />}
+        </Box>
 
 
         <Box sx={{ p: 2 }}>
           {/* Header */}
-          <Stack direction="row" justifyContent="space-between">
-            <Box>
-              <Typography fontWeight="bold">
-                Daftar Tujuan Kunjungan
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Pilih kampus yang akan dikunjungi
-              </Typography>
-            </Box>
-          </Stack>
+         <Stack direction="row" justifyContent="space-between">
+          <Box>
+            <Typography fontWeight="bold">
+              Daftar Tujuan Kunjungan
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Pilih kampus yang akan dikunjungi
+            </Typography>
+          </Box>
+            <Tooltip title="Pengaturan Parameter">
+                <IconButton
+                  onClick={() => {
+                    setTempParams(parameters); 
+                    setOpenParameterDialog(true)}
+                  }
+                  sx={{
+                    bgcolor: "white",
+                    boxShadow: 2,
+                    "&:hover": {
+                      bgcolor: "primary.main",
+                      color: "white",
+                    },
+                  }}
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+        </Stack>
 
           <Divider sx={{ my: 2 }} />
 
@@ -234,27 +297,27 @@ useEffect(() => {
               }}
             >
               {campuses.map((campus) => (
-  <Stack
-    key={campus.key}
-    direction="row"
-    alignItems="center"
-    spacing={1}
-    sx={{
-      px: 1,
-      py: 0.5,
-      cursor: "pointer",
-      borderRadius: 1,
-      transition: "0.2s",
-      "&:hover": {
-        bgcolor: "#f5f5f5",
-      },
-    }}
-    onClick={() => toggleCampus(campus.key)}
-  >
-    <Checkbox size="small" checked={selectedCampuses.includes(campus.key)} />
-    <Typography variant="body2">{campus.key}</Typography>
-  </Stack>
-))}
+          <Stack
+            key={campus.key}
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              px: 1,
+              py: 0.5,
+              cursor: "pointer",
+              borderRadius: 1,
+              transition: "0.2s",
+              "&:hover": {
+                bgcolor: "#f5f5f5",
+              },
+            }}
+            onClick={() => toggleCampus(campus.key)}
+          >
+            <Checkbox size="small" checked={selectedCampuses.includes(campus.key)} />
+            <Typography variant="body2">{campus.key}</Typography>
+          </Stack>
+        ))}
 
             </Box>
           </ClickAwayListener>
@@ -329,7 +392,7 @@ useEffect(() => {
               <DirectionsBikeIcon />
             </IconButton>
           </Stack>
-          
+
         <Stack direction="row" alignItems="center" sx={{ mt: 5 }} >
           <Checkbox
             size="small"
@@ -342,6 +405,241 @@ useEffect(() => {
         </Stack>
 
           <Divider sx={{ my: 2 }} />
+        <Dialog
+          open={openParameterDialog}
+          onClose={() => setOpenParameterDialog(false)}
+          fullWidth
+          maxWidth="sm"
+          PaperProps={{
+            sx: {
+              borderRadius: 4,
+              p: 1,
+            },
+          }}
+        >
+    <DialogTitle
+  sx={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    pr: 1,
+  }}
+>
+  {/* KIRI: Title + Deskripsi */}
+  <Box>
+    <Typography
+      sx={{
+        fontWeight: "bold",
+        fontSize: "1.3rem",
+      }}
+    >
+      Pengaturan Optimasi
+    </Typography>
+
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{ display: "block", mt: 0.5 }}
+    >
+      Ubah parameter untuk optimasi rute (default sudah optimal)
+    </Typography>
+  </Box>
+
+  {/* KANAN: Tombol Close */}
+  <IconButton
+    onClick={() => setOpenParameterDialog(false)}
+    sx={{
+      color: "grey.600",
+      "&:hover": {
+        color: "black",
+      },
+    }}
+  >
+    <CloseIcon />
+  </IconButton>
+</DialogTitle>
+
+          {/* CONTENT */}
+          <DialogContent
+            dividers
+            sx={{
+              maxHeight: "60vh",
+              overflowY: "auto",
+              "&::-webkit-scrollbar": { display: "none" },
+              scrollbarWidth: "none",
+            }}
+          >
+           
+
+            {/* ALPHA */}
+            <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f9f9f9", mb: 2 }}>
+              <Typography fontWeight={600}>Pengaruh Jejak Semut</Typography>
+              <TextField
+                type="number"
+                value={tempParams.ALPHA}
+                onChange={(e) =>
+                  setTempParams({
+                    ...tempParams,
+                    ALPHA: parseFloat(e.target.value),
+                  })
+                }
+                fullWidth
+                size="small"
+                sx={{ mt: 1 }}
+                inputProps={{ inputMode: "decimal" }}
+              />
+            </Box>
+
+            {/* BETA */}
+            <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f9f9f9", mb: 2 }}>
+              <Typography fontWeight={600}>Pengaruh Jarak</Typography>
+              <TextField
+                type="number"
+                value={tempParams.BETA}
+                onChange={(e) =>
+                  setTempParams({
+                    ...tempParams,
+                    BETA: parseFloat(e.target.value) || 0,
+                  })
+                }
+                fullWidth
+                size="small"
+                sx={{ mt: 1 }}
+              />
+            </Box>
+
+            {/* EVAPORATION */}
+            <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f9f9f9", mb: 2 }}>
+              <Typography fontWeight={600}>Penguapan Jejak</Typography>
+              <TextField
+                type="number"
+                value={tempParams.EVAPORATION}
+                onChange={(e) =>
+                  setTempParams({
+                    ...tempParams,
+                    EVAPORATION: parseFloat(e.target.value) || 0,
+                  })
+                }
+                fullWidth
+                size="small"
+                sx={{ mt: 1 }}
+              />
+            </Box>
+
+            {/* Q */}
+            <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f9f9f9", mb: 2 }}>
+              <Typography fontWeight={600}>Intensitas Jejak (Q)</Typography>
+              <TextField
+                type="number"
+                value={tempParams.QA}
+                onChange={(e) =>
+                  setTempParams({
+                    ...tempParams,
+                    QA: parseFloat(e.target.value) || 0,
+                  })
+                }
+                fullWidth
+                size="small"
+                sx={{ mt: 1 }}
+              />
+            </Box>
+
+            {/* NUM ANTS */}
+            <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f9f9f9", mb: 2 }}>
+              <Typography fontWeight={600}>Jumlah Semut</Typography>
+              <TextField
+                type="number"
+                value={tempParams.NUM_ANTS}
+                onChange={(e) =>
+                  setTempParams({
+                    ...tempParams,
+                    NUM_ANTS: parseInt(e.target.value) || 0,
+                  })
+                }
+                fullWidth
+                size="small"
+                sx={{ mt: 1 }}
+              />
+            </Box>
+
+            {/* ITERATIONS */}
+            <Box sx={{ p: 2, borderRadius: 3, bgcolor: "#f9f9f9", mb: 2 }}>
+              <Typography fontWeight={600}>Jumlah Iterasi</Typography>
+              <TextField
+                type="number"
+                value={tempParams.NUM_ITERATIONS}
+                onChange={(e) =>
+                  setTempParams({
+                    ...tempParams,
+                    NUM_ITERATIONS: parseInt(e.target.value) || 0,
+                  })
+                }
+                fullWidth
+                size="small"
+                sx={{ mt: 1 }}
+              />
+            </Box>
+
+          
+          </DialogContent>
+
+          {/* FOOTER */}
+          <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              disabled={!isChanged}
+              onClick={() => {
+                setTempParams({
+                  ALPHA: 4,
+                  BETA: 1,
+                  EVAPORATION: 1,
+                  QA: 100,
+                  NUM_ANTS: 10,
+                  NUM_ITERATIONS: 100,
+                });
+
+                setOpenParameterDialog(false); // optional (kalau mau langsung tutup)
+                showSnackbar("Parameter berhasil direset");
+              }}
+            >
+              Batal
+            </Button>
+
+           <Button
+              variant="contained"
+              fullWidth
+              disabled={!isChanged}
+              onClick={() => {
+                if (
+                  tempParams.ALPHA <= 0 ||
+                  tempParams.BETA <= 0 ||
+                  tempParams.NUM_ANTS <= 0 ||
+                  tempParams.NUM_ITERATIONS <= 0
+                ) {
+                  showSnackbar("Parameter tidak valid");
+                  return;
+                }
+
+                setParameters(tempParams);
+                setOpenParameterDialog(false);
+
+                showSnackbar("Parameter berhasil disimpan");
+              }}
+              sx={{
+                bgcolor: "#68a9cf", // bebas warna kamu
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "#3a7181",
+                },
+              }}
+            >
+              Simpan
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        
 
           {/* Action */}
           <Stack direction="row" spacing={1}>
