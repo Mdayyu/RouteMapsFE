@@ -59,6 +59,7 @@ import {
   }
 
   export default function RouteResultPage() {
+    const API = import.meta.env.VITE_API_URL;
     const [openSidebar, setOpenSidebar] = useState(false);
     const [showDetail, setShowDetail] = useState(false); // detail tabel
     const location = useLocation();
@@ -137,7 +138,7 @@ import {
     try {
       if (isMounted) setLoading(true);
 
-     const res = await fetch("http://127.0.0.1:8000/route", {
+     const res = await fetch(`${API}/route`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(routeParams), 
@@ -157,7 +158,7 @@ import {
   return () => {
     isMounted = false;
   };
-}, [routeParams]);
+}, [routeParams, API]);
 
 
 const paginationBtn = {

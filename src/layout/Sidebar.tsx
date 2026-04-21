@@ -45,13 +45,14 @@ interface SidebarProps {
 
 
 export function Sidebar({ open, onClose }: SidebarProps){
+  const API = import.meta.env.VITE_API_URL;
   const [parameters, setParameters] = useState({
-  ALPHA: 4,
-  BETA: 1,
-  EVAPORATION: 1,
+  ALPHA: 3,
+  BETA: 4,
+  EVAPORATION: 0.5,
   QA: 100,
   NUM_ANTS: 10,
-  NUM_ITERATIONS: 10,
+  NUM_ITERATIONS: 100,
 });
   const [vehicle, setVehicle] = useState<"mobil" | "sepeda">("mobil");
   const [openCampus, setOpenCampus] = useState(false);
@@ -69,14 +70,11 @@ export function Sidebar({ open, onClose }: SidebarProps){
   
 
 useEffect(() => {
-  fetch("http://127.0.0.1:8000/campuses")
+  fetch(`${API}/campuses`)
     .then((res) => res.json())
-    .then((data) => {
-      console.log("Data Kampus:", data); 
-      setCampuses(data); // Set data kampus ke state
-    })
-    .catch((err) => console.error("Failed to fetch campuses", err));
-}, []);
+    .then((data) => setCampuses(data))
+    .catch((err) => console.error(err));
+}, [API]);
 
 const handleCariRute = async () => {
   if (selectedCampuses.length === 0) {
@@ -101,7 +99,7 @@ const handleCariRute = async () => {
     });
 
     setLoading(false);
-  }, 500);
+  }, 800);
 };
 
   const [snackbar, setSnackbar] = useState({
@@ -591,9 +589,9 @@ const handleCariRute = async () => {
               disabled={!isChanged}
               onClick={() => {
                 setTempParams({
-                  ALPHA: 4,
-                  BETA: 1,
-                  EVAPORATION: 1,
+                  ALPHA: 3,
+                  BETA: 4,
+                  EVAPORATION: 0.5,
                   QA: 100,
                   NUM_ANTS: 10,
                   NUM_ITERATIONS: 100,
