@@ -33,7 +33,9 @@ import {
  import { useMediaQuery } from "@mui/material";
  import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet-fullscreen"; // register plugin
-import "leaflet-fullscreen/dist/leaflet.fullscreen.css"; // style
+import "leaflet-fullscreen/dist/leaflet.fullscreen.css"; 
+import "leaflet-fullscreen";
+import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 
 
 
@@ -106,18 +108,16 @@ import "leaflet-fullscreen/dist/leaflet.fullscreen.css"; // style
 
 
 
-function FullscreenControl() {
+function MapEffect() {
   const map = useMap();
-
   useEffect(() => {
-    const fullscreenControl = new L.Control.Fullscreen();
-    map.addControl(fullscreenControl);
-
+    const control = new L.Control.Fullscreen();
+    map.addControl(control);
     return () => {
-      map.removeControl(fullscreenControl);
+      map.removeControl(control);
     };
   }, [map]);
-  return null; 
+  return null; // ini hanya efek, bukan komponen
 }
 
 
@@ -569,7 +569,7 @@ const paginationBtn = {
                     style={{ height: "100%", width: "100%" }}
                     
                   >
-                     <FullscreenControl />
+                     <MapEffect/>
                      <LayersControl position="topright">
                     {/* Normal Map */}
                     <BaseLayer checked name="Peta">
