@@ -14,20 +14,11 @@ import {
     TableRow,
     Collapse,
   } from "@mui/material";
-//    declare module "leaflet" {
-//   namespace Control {
-//     class Fullscreen extends Control {
-//       constructor(options?: {
-//         position?: string;
-//         title?: string;
-//       });
-//     }
-//   }
-// }
+
   // import MapIcon from "@mui/icons-material/Map";
   import { useLocation } from "react-router-dom";
   import "leaflet/dist/leaflet.css";
-  import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
+  import { Polyline, Marker, Popup } from "react-leaflet";
   import { Navbar } from "../layout/Navbar";
   import { Sidebar } from "../layout/Sidebar";
   import { useEffect, useState } from "react";
@@ -40,6 +31,9 @@ import {
  import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
  import "leaflet-fullscreen";
  import { useMediaQuery } from "@mui/material";
+ import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet-fullscreen"; // register plugin
+import "leaflet-fullscreen/dist/leaflet.fullscreen.css"; // style
 
 
 
@@ -112,21 +106,19 @@ import {
 
 
 
-    function FullscreenControl() {
-      const map = useMap();
+function FullscreenControl() {
+  const map = useMap();
 
-      useEffect(() => {
-      //  const fullscreenControl = new L.Control.Fullscreen();
-       const fullscreenControl = new L.Control.Fullscreen();
-        map.addControl(fullscreenControl);
+  useEffect(() => {
+    const fullscreenControl = new L.Control.Fullscreen();
+    map.addControl(fullscreenControl);
 
-        return () => {
-          map.removeControl(fullscreenControl);
-        };
-      }, [map]);
-
-      return null;
-    }
+    return () => {
+      map.removeControl(fullscreenControl);
+    };
+  }, [map]);
+  return null; 
+}
 
 
     useEffect(() => {
@@ -620,8 +612,8 @@ const paginationBtn = {
                         position={seg.route[0]}
                         icon={
                           isStartPoint
-                            ? new L.Icon.Default()   // LLDIKTI pakai marker biasa
-                            : createNumberedIcon(idx) // mulai nomor dari 1
+                            ? new L.Icon.Default()   
+                            : createNumberedIcon(idx) 
                         }
                       >
                         <Popup>
