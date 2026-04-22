@@ -27,15 +27,18 @@ import {
   import { useMap } from "react-leaflet";
   import L from "leaflet";
   import { LayersControl } from "react-leaflet";
- import RouteIcon from "@mui/icons-material/Route";
- import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
- import "leaflet-fullscreen";
- import { useMediaQuery } from "@mui/material";
- import { MapContainer, TileLayer } from "react-leaflet";
-import "leaflet-fullscreen"; // register plugin
-import "leaflet-fullscreen/dist/leaflet.fullscreen.css"; 
-import "leaflet-fullscreen";
-import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
+  import RouteIcon from "@mui/icons-material/Route";
+  import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
+  import "leaflet-fullscreen";
+  import { useMediaQuery } from "@mui/material";
+  import { MapContainer, TileLayer } from "react-leaflet";
+  import "leaflet/dist/leaflet.css";
+  import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
+  import "leaflet-fullscreen";
+  import icon from 'leaflet/dist/images/marker-icon.png';
+  import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import React from "react";
+
 
 
 
@@ -77,35 +80,26 @@ import "leaflet-fullscreen/dist/leaflet.fullscreen.css";
 
 
     useEffect(() => {
-  console.log("📦 DATA DITERIMA DI ROUTE PAGE:", routeParams);
-}, [routeParams]);
+      console.log("📦 DATA DITERIMA DI ROUTE PAGE:", routeParams);
+    }, [routeParams]);
 
+    const DefaultIcon = L.icon({
+      iconUrl: icon,
+      shadowUrl: iconShadow,
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+    });
 
-    const createNumberedIcon = (number: number) =>
-      L.divIcon({
-        className: "",
-        html: `
-          <div style="
-            background:#1976d2;
-            color:white;
-            width:32px;
-            height:32px;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-weight:bold;
-            font-size:14px;
-            border:3px solid white;
-            box-shadow: 0 0 4px rgba(0,0,0,0.4);
-          ">
-            ${number}
-          </div>
-        `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-      });
+    // Set sebagai default untuk semua Marker
+    L.Marker.prototype.options.icon = DefaultIcon;
+    
 
+    const getRandomColor = (index: number, total: number): string => {
+  // Jika total 1, gunakan warna default agar tidak bagi nol
+  const hue = total > 1 ? (index * (360 / total)) % 360 : 200;
+  return `hsl(${hue}, 70%, 50%)`;
+};
+  
 
 
 function MapEffect() {
@@ -259,8 +253,8 @@ const paginationBtn = {
                     sx={{
                       width: "100%",
                      maxWidth: isMobile ? 250 : 360,
+                      p: isMobile ? 2 : 3,
                       borderRadius: 4,
-                      p: 3,
                       background: "linear-gradient(135deg, #fae5e0, #dfbab2)",
                       boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
                     }}
@@ -307,7 +301,7 @@ const paginationBtn = {
                       width: "100%",
                       maxWidth: isMobile ? 250 : 360,
                       borderRadius: 4,
-                      p: 3,
+                      p: isMobile ? 2 : 3,
                       background: "linear-gradient(135deg, #e8f5e9, #c8e6c9)",
                       boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
                     }}
@@ -570,7 +564,7 @@ const paginationBtn = {
                     
                   >
                      <MapEffect/>
-                     <LayersControl position="topright">
+                     <LayersControl position="bottomleft">
                     {/* Normal Map */}
                     <BaseLayer checked name="Peta">
                       <TileLayer
@@ -595,48 +589,67 @@ const paginationBtn = {
                     </BaseLayer>
                   </LayersControl>
 
-                    {routeResult.segments.map((seg, idx) => (
+                {routeResult.segments.map((seg, idx) => {
+                  const totalSegments = routeResult.segments.length;
+                  const segmentColor = getRandomColor(idx, totalSegments);
+                  const isLastSegment = idx === totalSegments - 1;
+                  const isStartPoint = idx === 0;
+
+                  return (
+                    <React.Fragment key={`route-group-${idx}`}>
+                      {/* Garis Rute */}
                       <Polyline
-                        key={idx}
-                        positions={seg.route.map(([lat, lon]) => [lat, lon])}
-                        color="blue"
+                        positions={seg.route}
+                        pathOptions={{
+                          color: segmentColor,
+                          weight: 6,
+                          opacity: 0.8,
+                        }}
                       />
-                    ))}
 
-                   {routeResult.segments.map((seg, idx) => {
-                    const isStartPoint = idx === 0;
-
-                    return (
+                      {/* Marker Titik Awal Segmen */}
                       <Marker
-                        key={`start-${idx}`}
                         position={seg.route[0]}
-                        icon={
-                          isStartPoint
-                            ? new L.Icon.Default()   
-                            : createNumberedIcon(idx) 
-                        }
+                        zIndexOffset={500}
+                        icon={L.divIcon({
+                          className: "custom-marker",
+                          html: `<div style="background: ${segmentColor}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                            ${isStartPoint ? 'Start' : idx}
+                          </div>`,
+                          iconSize: [30, 30],
+                          iconAnchor: [15, 15]
+                        })}
                       >
                         <Popup>
-                          {isStartPoint ? "LLDIKTI" : `${idx}. ${seg.from}`}
+                          {/* Hanya menampilkan nama lokasi (misal: "LLDIKTI" atau "Kampus 1") */}
+                          <strong>{seg.from}</strong>
                         </Popup>
                       </Marker>
-                    );
-                  })}
 
-
-                    <Marker
-                      position={
-                        routeResult.segments[
-                          routeResult.segments.length - 1
-                        ].route.slice(-1)[0]
-                      }
-                    >
-                      <Popup>
-                        {routeResult.segments[routeResult.segments.length - 1].to}
-                      </Popup>
-                      
-                    </Marker>
-                    
+                      {/* Marker Khusus Tujuan Terakhir */}
+                      {isLastSegment && (
+                        <Marker
+                          position={seg.route[seg.route.length - 1]}
+                          zIndexOffset={600}
+                          icon={L.divIcon({
+                            className: "custom-marker-end",
+                            html: `<div style="background: #d32f2f; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                              ${seg.to.toLowerCase().includes("lldikti") ? 'Start' : idx + 1}
+                            </div>`,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
+                          })}
+                        >
+                          <Popup>
+                            {/* Hanya menampilkan nama lokasi tujuan akhir saja */}
+                            <strong>{seg.to}</strong>
+                          </Popup>
+                        </Marker>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+                                    
                   </MapContainer>
                 )}
                 </Box>
