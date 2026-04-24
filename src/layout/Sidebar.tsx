@@ -47,11 +47,11 @@ interface SidebarProps {
 export function Sidebar({ open, onClose }: SidebarProps){
   const API = import.meta.env.VITE_API_URL;
   const [parameters, setParameters] = useState({
-  ALPHA: 3,
-  BETA: 4,
+  ALPHA: 1,
+  BETA: 3,
   EVAPORATION: 0.5,
   QA: 100,
-  NUM_ANTS: 10,
+  NUM_ANTS: 100,
   NUM_ITERATIONS: 100,
 });
   const [vehicle, setVehicle] = useState<"mobil" | "sepeda">("mobil");
@@ -589,15 +589,15 @@ const handleCariRute = async () => {
               disabled={!isChanged}
               onClick={() => {
                 setTempParams({
-                  ALPHA: 3,
-                  BETA: 4,
+                  ALPHA: 1,
+                  BETA: 3,
                   EVAPORATION: 0.5,
                   QA: 100,
-                  NUM_ANTS: 10,
+                  NUM_ANTS: 100,
                   NUM_ITERATIONS: 100,
                 });
 
-                setOpenParameterDialog(false); // optional (kalau mau langsung tutup)
+                setOpenParameterDialog(false); 
                 showSnackbar("Parameter berhasil direset");
               }}
             >
