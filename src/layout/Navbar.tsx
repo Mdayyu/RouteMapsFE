@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Avatar, Box, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Box,  IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useTheme, useMediaQuery } from "@mui/material";
 
@@ -60,14 +60,14 @@ const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
         {/* KANAN: USER */}
         <Box display="flex" alignItems="center" gap={2} ml="auto">
-          <Typography 
+          {/* <Typography 
             variant="body2"
             sx={{ display: { xs: "none", sm: "block" } }}
           >
             Made Ayu
           </Typography>
 
-          <Avatar />
+          <Avatar /> */}
         </Box>
 
       </Toolbar>
