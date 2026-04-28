@@ -1,4 +1,6 @@
-
+<pre>
+{JSON.stringify(data, null, 2)}
+</pre>
 import {
     Box,
     Card,
@@ -16,7 +18,7 @@ import {
   } from "@mui/material";
 
   // import MapIcon from "@mui/icons-material/Map";
-  import { useLocation } from "react-router-dom";
+  import { data, useLocation } from "react-router-dom";
   import "leaflet/dist/leaflet.css";
   import { Polyline, Marker, Popup } from "react-leaflet";
   import { Navbar } from "../layout/Navbar";
@@ -48,12 +50,14 @@ import React from "react";
     to: string;
     distance_km: number;
     duration_min: number;
+    execution_time_sec: number;
     route: [number, number][]; // array of [lat, lon]
   }
 
   interface RouteResult {
     total_distance_km: number;
     total_duration_min: number;
+    execution_time_sec: number;
     segments: Segment[];
   }
 
