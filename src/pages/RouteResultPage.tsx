@@ -1,6 +1,4 @@
-<pre>
-{JSON.stringify(data, null, 2)}
-</pre>
+
 import {
     Box,
     Card,
@@ -18,7 +16,7 @@ import {
   } from "@mui/material";
 
   // import MapIcon from "@mui/icons-material/Map";
-  import { data, useLocation } from "react-router-dom";
+  import {  useLocation } from "react-router-dom";
   import "leaflet/dist/leaflet.css";
   import { Polyline, Marker, Popup } from "react-leaflet";
   import { Navbar } from "../layout/Navbar";
@@ -39,9 +37,7 @@ import {
   import "leaflet-fullscreen";
   import icon from 'leaflet/dist/images/marker-icon.png';
   import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import React from "react";
-
-
+  import React from "react";
 
 
 
@@ -50,8 +46,7 @@ import React from "react";
     to: string;
     distance_km: number;
     duration_min: number;
-    execution_time_sec: number;
-    route: [number, number][]; // array of [lat, lon]
+    route: [number, number][]; 
   }
 
   interface RouteResult {
@@ -59,6 +54,7 @@ import React from "react";
     total_duration_min: number;
     execution_time_sec: number;
     segments: Segment[];
+    test: number;
   }
 
   export default function RouteResultPage() {
@@ -85,6 +81,7 @@ import React from "react";
 
     useEffect(() => {
       console.log("📦 DATA DITERIMA DI ROUTE PAGE:", routeParams);
+      
     }, [routeParams]);
 
     const DefaultIcon = L.icon({
@@ -99,11 +96,11 @@ import React from "react";
     
 
     const getRandomColor = (index: number, total: number): string => {
-  // Jika total 1, gunakan warna default agar tidak bagi nol
-  const hue = total > 1 ? (index * (360 / total)) % 360 : 200;
-  return `hsl(${hue}, 70%, 50%)`;
-};
-  
+    // Jika total 1, gunakan warna default agar tidak bagi nol
+    const hue = total > 1 ? (index * (360 / total)) % 360 : 200;
+    return `hsl(${hue}, 70%, 50%)`;
+  };
+    
 
 
 function MapEffect() {
@@ -115,7 +112,7 @@ function MapEffect() {
       map.removeControl(control);
     };
   }, [map]);
-  return null; // ini hanya efek, bukan komponen
+  return null; 
 }
 
 
@@ -190,7 +187,6 @@ const paginationBtn = {
         sx={{
           mt: "64px",
 
-          // 💻 Desktop → geser konten kalau sidebar buka
           ml: !isTablet && openSidebar ? "400px" : 0,
           width: !isTablet && openSidebar
             ? "calc(100% - 400px)"
@@ -207,8 +203,6 @@ const paginationBtn = {
       >
 
 
-          {/* CONTENT */}
-          {/* <Stack spacing={4} > */}
           <Stack
             spacing={3}
             sx={{
@@ -527,8 +521,6 @@ const paginationBtn = {
                         </Box>
                       )}
                     </Stack>
-
-
                     </Box>
                   )}
                   </Box>
