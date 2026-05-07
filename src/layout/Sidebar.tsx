@@ -45,6 +45,8 @@ interface SidebarProps {
 
 
 export function Sidebar({ open, onClose }: SidebarProps){
+  const role = localStorage.getItem("role");
+  
   const API = import.meta.env.VITE_API_URL;
   const [parameters, setParameters] = useState({
   ALPHA: 1,
@@ -234,6 +236,7 @@ const handleCariRute = async () => {
                     },
                   }}
                 >
+                 
                   <SettingsIcon />
                 </IconButton>
               </Tooltip>
@@ -475,6 +478,7 @@ const handleCariRute = async () => {
               <TextField
                 type="number"
                 value={tempParams.ALPHA}
+                disabled={role !== "admin"}
                 onChange={(e) =>
                   setTempParams({
                     ...tempParams,
@@ -494,6 +498,7 @@ const handleCariRute = async () => {
               <TextField
                 type="number"
                 value={tempParams.BETA}
+                disabled={role !== "admin"}
                 onChange={(e) =>
                   setTempParams({
                     ...tempParams,
@@ -512,6 +517,7 @@ const handleCariRute = async () => {
               <TextField
                 type="number"
                 value={tempParams.EVAPORATION}
+                disabled={role !== "admin"}
                 onChange={(e) =>
                   setTempParams({
                     ...tempParams,
@@ -530,6 +536,7 @@ const handleCariRute = async () => {
               <TextField
                 type="number"
                 value={tempParams.QA}
+                disabled={role !== "admin"}
                 onChange={(e) =>
                   setTempParams({
                     ...tempParams,
@@ -548,6 +555,7 @@ const handleCariRute = async () => {
               <TextField
                 type="number"
                 value={tempParams.NUM_ANTS}
+                disabled={role !== "admin"}
                 onChange={(e) =>
                   setTempParams({
                     ...tempParams,
@@ -566,6 +574,7 @@ const handleCariRute = async () => {
               <TextField
                 type="number"
                 value={tempParams.NUM_ITERATIONS}
+                disabled={role !== "admin"}
                 onChange={(e) =>
                   setTempParams({
                     ...tempParams,
@@ -582,59 +591,67 @@ const handleCariRute = async () => {
           </DialogContent>
 
           {/* FOOTER */}
-          <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              disabled={!isChanged}
-              onClick={() => {
-                setTempParams({
-                  ALPHA: 1,
-                  BETA: 3,
-                  EVAPORATION: 0.5,
-                  QA: 100,
-                  NUM_ANTS: 100,
-                  NUM_ITERATIONS: 100,
-                });
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+          {role === "admin" ? (
+            <>
+              <Button
+                variant="outlined"
+                fullWidth
+                disabled={!isChanged}
+                onClick={() => {
+                  setTempParams({
+                    ALPHA: 1,
+                    BETA: 3,
+                    EVAPORATION: 0.5,
+                    QA: 100,
+                    NUM_ANTS: 100,
+                    NUM_ITERATIONS: 100,
+                  });
 
-                setOpenParameterDialog(false); 
-                showSnackbar("Parameter berhasil direset");
-              }}
-            >
-              Batal
-            </Button>
+                  setOpenParameterDialog(false);
+                  showSnackbar("Parameter berhasil direset");
+                }}
+              >
+                Batal
+              </Button>
 
-           <Button
-              variant="contained"
-              fullWidth
-              disabled={!isChanged}
-              onClick={() => {
-                if (
-                  tempParams.ALPHA <= 0 ||
-                  tempParams.BETA <= 0 ||
-                  tempParams.NUM_ANTS <= 0 ||
-                  tempParams.NUM_ITERATIONS <= 0
-                ) {
-                  showSnackbar("Parameter tidak valid");
-                  return;
-                }
+              <Button
+                variant="contained"
+                fullWidth
+                disabled={!isChanged}
+                onClick={() => {
+                  if (
+                    tempParams.ALPHA <= 0 ||
+                    tempParams.BETA <= 0 ||
+                    tempParams.NUM_ANTS <= 0 ||
+                    tempParams.NUM_ITERATIONS <= 0
+                  ) {
+                    showSnackbar("Parameter tidak valid");
+                    return;
+                  }
 
-                setParameters(tempParams);
-                setOpenParameterDialog(false);
+                  setParameters(tempParams);
+                  setOpenParameterDialog(false);
 
-                showSnackbar("Parameter berhasil disimpan");
-              }}
-              sx={{
-                bgcolor: "#68a9cf", // bebas warna kamu
-                fontWeight: "bold",
-                "&:hover": {
-                  bgcolor: "#3a7181",
-                },
-              }}
-            >
-              Simpan
-            </Button>
-          </DialogActions>
+                  showSnackbar("Parameter berhasil disimpan");
+                }}
+                sx={{
+                  bgcolor: "#68a9cf",
+                  fontWeight: "bold",
+                  "&:hover": {
+                    bgcolor: "#3a7181",
+                  },
+                }}
+              >
+                Simpan
+              </Button>
+            </>
+          ) : (
+            <Typography variant="body2" sx={{ px: 1 }}>
+              Anda hanya dapat melihat parameter ini. Hubungi admin jika ingin mengubah.
+            </Typography>
+          )}
+        </DialogActions>
         </Dialog>
 
         
