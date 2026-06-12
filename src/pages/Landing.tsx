@@ -70,20 +70,20 @@ const Landing = () => {
        <Box
   sx={{
     display: "flex",
-    gap: 6, // 🔥 jarak antar card diperbesar
+    gap: 6, // 
     flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
     mt: 8,
   }}
 >
-  {/* 🔥 ADMIN */}
+  
   <motion.div whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }}>
     <Box
       onClick={() => navigate("/login")}
       sx={{
-        width: { xs: "100%", sm: 360, md: 420 }, // 🔥 lebih besar
-        p: 6, // 🔥 padding diperbesar
+        width: { xs: "100%", sm: 360, md: 420 }, 
+        p: 6, 
         cursor: "pointer",
         textAlign: "center",
         borderRadius: 6,
@@ -110,7 +110,7 @@ const Landing = () => {
     </Box>
   </motion.div>
 
-  {/* 🔥 PUBLIC */}
+  
   <motion.div whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }}>
     <Box
       onClick={handlePublic}

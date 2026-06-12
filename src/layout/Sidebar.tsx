@@ -42,8 +42,6 @@ interface SidebarProps {
 
 
 
-
-
 export function Sidebar({ open, onClose }: SidebarProps){
   const role = localStorage.getItem("role");
   
@@ -53,7 +51,7 @@ export function Sidebar({ open, onClose }: SidebarProps){
   BETA: 3,
   EVAPORATION: 0.5,
   QA: 100,
-  NUM_ANTS: 100,
+  NUM_ANTS: 50,
   NUM_ITERATIONS: 100,
 });
   const [vehicle, setVehicle] = useState<"mobil" | "sepeda">("mobil");
@@ -94,7 +92,7 @@ const handleCariRute = async () => {
       ...parameters, //  parameter terbaru
     };
 
-    console.log("🚀 DATA DIKIRIM:", payload); // DEBUG
+    console.log(" DATA DIKIRIM:", payload); // DEBUG
 
     navigate("/route", {
       state: payload,
@@ -418,47 +416,47 @@ const handleCariRute = async () => {
             },
           }}
         >
-    <DialogTitle
-  sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    pr: 1,
-  }}
->
-  {/* KIRI: Title + Deskripsi */}
-  <Box>
-    <Typography
-      sx={{
-        fontWeight: "bold",
-        fontSize: "1.3rem",
-      }}
-    >
-      Pengaturan Optimasi
-    </Typography>
+          <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          pr: 1,
+        }}
+      >
+        {/* KIRI: Title + Deskripsi */}
+        <Box>
+          <Typography
+            sx={{
+              fontWeight: "bold",
+              fontSize: "1.3rem",
+            }}
+          >
+            Pengaturan Optimasi
+          </Typography>
 
-    <Typography
-      variant="caption"
-      color="text.secondary"
-      sx={{ display: "block", mt: 0.5 }}
-    >
-      Ubah parameter untuk optimasi rute (default sudah optimal)
-    </Typography>
-  </Box>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mt: 0.5 }}
+          >
+            Ubah parameter untuk optimasi rute (default sudah optimal)
+          </Typography>
+        </Box>
 
-  {/* KANAN: Tombol Close */}
-  <IconButton
-    onClick={() => setOpenParameterDialog(false)}
-    sx={{
-      color: "grey.600",
-      "&:hover": {
-        color: "black",
-      },
-    }}
-  >
-    <CloseIcon />
-  </IconButton>
-</DialogTitle>
+        {/* KANAN: Tombol Close */}
+        <IconButton
+          onClick={() => setOpenParameterDialog(false)}
+          sx={{
+            color: "grey.600",
+            "&:hover": {
+              color: "black",
+            },
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
           {/* CONTENT */}
           <DialogContent

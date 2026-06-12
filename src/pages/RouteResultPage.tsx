@@ -54,7 +54,7 @@ import {
     total_duration_min: number;
     execution_time_sec: number;
     segments: Segment[];
-    test: number;
+    // test: number;
   }
 
   export default function RouteResultPage() {
@@ -80,7 +80,7 @@ import {
 
 
     useEffect(() => {
-      console.log("📦 DATA DITERIMA DI ROUTE PAGE:", routeParams);
+      console.log("DATA DITERIMA DI ROUTE PAGE:", routeParams);
       
     }, [routeParams]);
 
@@ -568,7 +568,7 @@ const paginationBtn = {
                         attribution='&copy; OpenStreetMap contributors'
                       />
                     </BaseLayer>
-                                  {/* Satellite */}
+                    {/* Satellite */}
                     <BaseLayer name="Satelit">
                       <TileLayer
                         url="https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
