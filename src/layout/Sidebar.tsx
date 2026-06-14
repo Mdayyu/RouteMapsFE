@@ -48,7 +48,7 @@ export function Sidebar({ open, onClose }: SidebarProps){
   const API = import.meta.env.VITE_API_URL;
   const [parameters, setParameters] = useState({
   ALPHA: 1,
-  BETA: 3,
+  BETA: 2,
   EVAPORATION: 0.5,
   QA: 100,
   NUM_ANTS: 50,
@@ -599,7 +599,7 @@ const handleCariRute = async () => {
                 onClick={() => {
                   setTempParams({
                     ALPHA: 1,
-                    BETA: 3,
+                    BETA: 2,
                     EVAPORATION: 0.5,
                     QA: 100,
                     NUM_ANTS: 100,
